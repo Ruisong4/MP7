@@ -1,0 +1,220 @@
+﻿  <!DOCTYPE HTML>
+<html>
+<meta charset="utf-8"/>
+<head>
+<title></title>
+<style>
+li,ul,img{padding:0px;margin:0;}
+ul{width:252px;margin:30px auto;}
+</style>
+<script>
+window.onload = function(){
+	var map = [
+[0,0,1,1,1,1,1,0,0],
+[0,1,1,2,2,2,1,1,0],
+[0,1,2,2,5,4,2,1,1],
+[1,1,5,2,1,4,5,4,1],
+[1,2,2,2,1,4,4,4,1],
+[1,2,5,1,1,1,5,2,1],
+[1,2,2,5,2,5,2,2,1],
+[1,1,3,2,2,2,2,1,1],
+[0,1,1,1,1,1,1,1,0]
+              ]; //创建地图
+	var aBac = ["img/00.png","img/01.png","img/02.png","img/03.png","img/04.png","img/05.png","img/06.png"];
+	//储存
+	var a = document.getElementById('ul1');
+	
+	
+	for(var i=0;i<81;i++){var oLi = document.createElement('li');
+	                     oLi.style.listStyle = "none"
+						 oLi.style.cssFloat = "left"
+						 oLi.style.height = "28px";
+						 oLi.style.width = "28px";
+						   a.appendChild(oLi) ;};
+						   
+						   //加载Li
+						   
+	var aLi = document.getElementsByTagName('li');
+	
+	
+	for(var j=0;j<aLi.length;j++){
+		var oImg = document.createElement("img");
+		oImg.src = aBac[0]
+		aLi[j].appendChild(oImg)
+		};   //地图背景色初始化完成
+		
+		
+		
+		var aImg = document.getElementsByTagName('img')
+		
+		//alert(aImg.length)
+		
+		for(var m=0;m<map.length;m++){
+			for(var n=0;n<map[1].length;n++){
+				switch(map[m][n]){
+					case 1:
+					    aImg[9*m + n].src = aBac[1]
+						break;
+					case 2:
+					    aImg[9*m + n].src = aBac[2]
+						break;
+					case 3:
+					    aImg[9*m + n].src = aBac[3]
+						break;
+					case 4:
+					    aImg[9*m + n].src = aBac[4]
+						break;
+					case 5:
+					    aImg[9*m + n].src = aBac[5]
+						break;}
+				//		完成地图初始化 关卡加载完毕				
+				};
+			}//遍历二维地图数组结束
+
+//开始制作功能：因为我最讨厌什么绝对定位，这里用数组改变的方法代替，效果可能没有MOVE 的方法华丽
+ 
+ document.onkeydown = function(ev){
+     manPosition()
+	 var ev = ev||event
+	 var x = manPosition().x
+	 var y = manPosition().y
+	
+	 switch(ev.keyCode){
+        case 37:    // the following is logic for miving left
+        if( map[x][y-1] === 4 || map[x][y-1] === 2 ) //if the left block is ground or target ground
+		{
+		 map[x][y-1] = 3; //change left block to person in block because you can go to there
+		 aImg[x*9+y-1].src = aBac[3];// change the corresponding image to person too
+		    restore(x,y) ;//restore the previous loction
+		}// ground and target ground logic end here
+		else if( map[x][y-1] === 5 || map[x][y-1] === 6 )// if the left side is a box. both box or box on target
+		{
+		 if(map[x][y-2] === 2)// if it is ground
+		 {
+		 map[x][y-1] = 3;aImg[x*9+y-1].src = aBac[3];
+         map[x][y-2] = 5;aImg[x*9+y-2].src = aBac[5]
+         restore(x,y);
+		 }
+		 else if( map[x][y-2] === 4)// if it is target ground
+		 {
+		 map[x][y-1] = 3;aImg[x*9+y-1].src = aBac[3]
+         map[x][y-2] = 6;aImg[x*9+y-2].src = aBac[6]
+             checkwin();
+          restore(x,y);
+		 }
+		 	 
+		}// box logic end here
+		else if( y === 1 ){ break; } // if it is a wall we do not do anything
+		break;//left logic end here
+		
+     	case 38:   	//上
+        if(map[x-1][y] === 4 ||map[x-1][y] === 2 )
+		{   map[x-1][y] = 3;aImg[(x-1)*9+y].src = aBac[3];
+            restore(x,y)
+		}
+		else if(map[x-1][y] === 5 || map[x-1][y] === 6)
+		{
+		   if(map[x-2][y] === 2)
+		   {
+		     map[x-2][y] = 5;map[x-1][y] = 3;aImg[(x-1)*9+y].src = aBac[3];aImg[(x-2)*9+y].src = aBac[5]
+               restore(x,y)
+		   }
+		   else if(map[x-2][y] === 4)
+		   {
+		     map[x-2][y] = 6;map[x-1][y] = 3;aImg[(x-1)*9+y].src = aBac[3];aImg[(x-2)*9+y].src = aBac[6]
+               restore(x,y)
+               checkwin();
+			 
+		   }
+		}
+		else if(x === '1') {break};
+		break;
+		
+	case 39:    //右
+	        if( map[x][y+1] === 4 || map[x][y+1] === 2 )
+		{
+		 map[x][y+1] = 3;aImg[x*9+y+1].src = aBac[3];
+            restore(x,y)
+		}
+		else if( map[x][y+1] === 5 || map[x][y+1] === 6 )
+		{
+		 if(map[x][y+2] === 2)
+		 {
+		 map[x][y+1] = 3;aImg[x*9+y+1].src = aBac[3];
+         map[x][y+2] = 5;aImg[x*9+y+2].src = aBac[5]
+             restore(x,y)
+		 }
+		 else if( map[x][y+2] === 4)
+		 {
+		 map[x][y+1] = 3;aImg[x*9+y+1].src = aBac[3]
+         map[x][y+2] = 6;aImg[x*9+y+2].src = aBac[6]
+             restore(x,y)
+             checkwin();
+		 }
+		 	 
+		}
+		else if( y === 7 ){ break; }
+		break;
+	
+	case 40:    //下
+    if(map[x+1][y] === 2 || map[x+1][y] === 4)
+	{
+	  map[x+1][y] = 3;aImg[(x+1)*9+y].src = aBac[3]
+        restore(x,y)
+	}
+	else if(map[x+1][y] === 5 || map[x+1][y] === 6)
+	{
+	  if( map[x+2][y] === 2 )
+	  {
+	    map[x+1][y] = 3;aImg[(x+1)*9+y].src = aBac[3];
+		map[x+2][y] = 5;aImg[(x+2)*9+y].src = aBac[5];
+          restore(x,y)
+	  }
+	  else if( map[x+2][y] === 4 )
+	  {
+	    map[x+1][y] = 3;aImg[(x+1)*9+y].src = aBac[3];
+		map[x+2][y] = 6;aImg[(x+2)*9+y].src = aBac[6];
+          restore(x,y)
+          checkwin();
+	  }
+	}
+	else if(x === 7){break}
+	break;
+	
+}
+}
+
+            function restore(x,y){
+                if(x.toString() + y.toString() == '25'||x.toString() + y.toString() =='26'||x.toString() + y.toString() =='35'||x.toString() + y.toString() =='37'||x.toString() + y.toString() =='45'||x.toString() + y.toString() =='46'||x.toString() + y.toString() =='47')
+                {map[x][y] = 4;aImg[x*9+y].src = aBac[4]}// if the person used to stand on a target ground, change it back to target ground
+                else{map[x][y] = 2;aImg[x*9+y].src = aBac[2]}// otherwise, it means person used to stand on common ground, so change it back to common groundpicture
+
+            }
+
+
+            function manPosition(){
+			for(var i=0;i<map.length;i++)
+			for(var j=0;j<map[1].length;j++)
+					if(map[i][j] == '3')				
+				    return {'x':i,'y':j}; }//定义一个函数，帮助找人在哪里
+  
+  function checkwin() {
+    var f = true;
+      for(var i=0;i<map.length;i++)
+          for(var j=0;j<map[1].length;j++)
+              if(map[i][j] == '5')
+                  f = false;
+
+      if(f){
+          alert("you win")
+          location.reload(true);
+      }
+  }
+  
+};
+</script>
+</head>
+<body>
+<ul id="ul1"></ul>
+</body>
+</html>
